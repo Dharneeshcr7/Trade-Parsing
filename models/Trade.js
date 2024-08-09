@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
 
 const TradeSchema=new mongoose.Schema({
-    userid:{
+    User_ID:{
         type:String,
         required:true
     },
-    utc_time:{
+    UTC_Time:{
         type:Date,
         required:true
     },
-    market:{
+    Market:{
         type:String,
         required:true,
     },
@@ -17,15 +17,15 @@ const TradeSchema=new mongoose.Schema({
         type:Number,
         required:true,
     },
-    price:{
+    Price:{
         type:Number,
         required:true,
     },
-    cumumtative:{
+    cumm:{
         type:Object,
     }
 
 })
-TradeSchema.index({utc_time:1});
+TradeSchema.index({UTC_Time:1});
 
 export default mongoose.model("Trade",TradeSchema);

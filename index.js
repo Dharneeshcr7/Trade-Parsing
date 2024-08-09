@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import tradeRouter from "./routes/trade.js"
 const app=express();
 dotenv.config()
 
@@ -31,7 +32,7 @@ const connect=async ()=>{
 }
 mongoose.connection.on('disconnected', () => console.log('disconnected'));
 
-
+app.use("/",tradeRouter)
 app.listen(port,()=>{
     connect();
     console.log("Backend started!!");
