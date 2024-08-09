@@ -36,8 +36,7 @@ export const addData = async (req, res, next) => {
 
 export const getBalance = async (req, res) => {
     
-    const new_date=moment(req.body.timestamp, 'YYYY-MM-DD HH:mm:ss').toDate();
-    
+    const new_date=moment.utc(req.body.timestamp, 'YYYY-MM-DD HH:mm:ss').toDate();
     const trades = await Trade
             .find({ UTC_Time: { $lte: new_date } }) 
             .sort({ UTC_Time: 1 })
@@ -45,7 +44,7 @@ export const getBalance = async (req, res) => {
     
     for (const trade of trades){
         const mark=trade.Market.split("/")[0]
-        
+        console.log(trade)
         if (typeof cumm[mark] !== 'number') {
             cumm[mark] = 0; 
         }
