@@ -21,8 +21,9 @@ const TradeSchema=new mongoose.Schema({
         type:Number,
         required:true,
     },
-    cumm:{
-        type:Object,
+    Operation:{
+        type:String,
+        required:true,
     }
 
 })

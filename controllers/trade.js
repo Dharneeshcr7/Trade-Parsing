@@ -15,8 +15,13 @@ export const addData = async (req, res, next) => {
             })
             .on('end', async () => {
                 for (const row of rows) {
+                    row['units']=row['Buy/Sell Amount']
+                    delete row['Buy/Sell Amount'];
+                    const mark=row.Market.split("/")[0]
                     
-                    prev = await addtoDB(prev, row);
+                    const new_trade=new Trade(row)
+
+                    await new_trade.save();
                 }
                 res.status(200).json({ message: 'Data added successfully!' });
             })
@@ -33,45 +38,32 @@ export const getBalance = async (req, res) => {
     
     const new_date=moment(req.body.timestamp, 'YYYY-MM-DD HH:mm:ss').toDate();
     
-    const trade = await Trade
+    const trades = await Trade
             .find({ UTC_Time: { $lte: new_date } }) 
-            .sort({ UTC_Time: -1 })
-            .limit(1) 
-    console.log(trade)
-    res.status(200).json(trade[0].cumm)
-};
-
-const addtoDB = async (prev, row) => {
-
-    row['units']=row['Buy/Sell Amount']
-    delete row['Buy/Sell Amount'];
-    const mark=row.Market.split("/")[0]
-    if(prev)
-      row.cumm = { ...prev.cumm };
-    else
-       row.cumm = {};
-
+            .sort({ UTC_Time: 1 })
+    let cumm={}
     
-    if (typeof row.cumm[mark] !== 'number') {
-        row.cumm[mark] = 0; 
+    for (const trade of trades){
+        const mark=trade.Market.split("/")[0]
+        
+        if (typeof cumm[mark] !== 'number') {
+            cumm[mark] = 0; 
+        }
+        if(trade.Operation=='Sell'){
+
+        cumm[mark]-=parseInt(trade.units)  
+        }     
+        else{
+        cumm[mark]+=parseInt(trade.units)
+        }
+
+        if(cumm[mark]==0)
+            delete cumm[mark]
+
     }
-    if(row.Operation=='Sell'){
-
-       row.cumm[mark]-=parseInt(row.units)  
-    }     
-    else{
-      row.cumm[mark]+=parseInt(row.units)
-    }
-
-    if(row.cumm[mark]==0)
-        delete row.cumm[mark]
-
-    const new_trade=new Trade(row)
-
-    await new_trade.save();
-
-    return new_trade
-
-
+    return res.status(200).json(cumm)
+            
+    
 };
+
 
